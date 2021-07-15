@@ -1,6 +1,7 @@
 import React from 'react'
+import { useAppDispatch } from '../app/hooks'
 import styled from 'styled-components'
-
+import { fetchPosts, fetchComments, fetchAlbums } from '../features/buttonSlice'
 const StyledButtonWrapper = styled('div')`
   display: grid;
   margin: 10px;
@@ -14,14 +15,29 @@ const StyledButton = styled('button')`
   border: 5px inset blueviolet;
 `
 
-const buttons = () => {
+const Buttons = () => {
+  const dispatch = useAppDispatch()
   return (
     <StyledButtonWrapper>
-      <StyledButton>fetch</StyledButton>
-      <StyledButton>fetch</StyledButton>
-      <StyledButton>fetch</StyledButton>
-      <StyledButton>fetch</StyledButton>
-      <StyledButton>fetch</StyledButton>
+      <StyledButton
+        onClick={() => {
+          dispatch(fetchPosts())
+        }}
+      >
+        fetch posts
+      </StyledButton>
+      <StyledButton onClick={() => dispatch(fetchPosts())}>
+        fetch comments
+      </StyledButton>
+      <StyledButton
+        onClick={() => {
+          fetchAlbums()
+        }}
+      >
+        fetch albums{' '}
+      </StyledButton>
+      <StyledButton>fetch photos</StyledButton>
+      {/* <StyledButton>fetch</StyledButton> */}
     </StyledButtonWrapper>
   )
 }
