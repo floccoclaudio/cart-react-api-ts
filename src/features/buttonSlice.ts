@@ -1,49 +1,63 @@
-import { createAsyncThunk, createSlice, isRejectedWithValue } from "@reduxjs/toolkit";
-import { RootState } from '../app/rootreducer'
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { RootState } from "../app/rootreducer";
+// import { RootState } from "../app/rootreducer";
 
+//#region  Slice type declarations
 
-
-interface PostDataType {
-    userId: string;
+export interface FetchUserData {
     id: number;
-    title: string;
-    body: String;
+    name: string;
+    username: string;
+    email: string;
+    address: Address;
+    phone: string;
+    website: string;
+    company: Company;
 }
-interface CommentsDataType {
-    postId: number
-    id: number
-    name: string
-    email: string
-    body: string
+
+export interface Address {
+    street: string;
+    suite: string;
+    city: string;
+    zipcode: string;
+    geo: Geo;
 }
-export interface AlbumDataType {
-    userId: number
-    id: number
-    title: string
+
+export interface Geo {
+    lat: string;
+    lng: string;
+}
+
+export interface Company {
+    name: string;
+    catchPhrase: string;
+    bs: string;
 }
 
 
 interface InitialButtonStateType {
     posts: {
-        data: PostDataType[]
-        isLoading: boolean;
-        isError: boolean;
-        isSuccess: boolean;
+        data: FetchedPostData[],
+        isLoading: boolean,
+        isError: boolean,
+        isSuccess: boolean
     }
-    comments: {
-        data: CommentsDataType[];
-        isLoading: boolean;
-        isError: boolean;
-        isSuccess: boolean;
+    users: {
+        data: FetchUserData[],
+        isLoading: boolean,
+        isError: boolean,
+        isSuccess: boolean,
+        chosenId?: FetchUserData
     }
-    albums: {
-        data: AlbumDataType[],
-        isLoading: boolean;
-        isError: boolean;
-        isSuccess: boolean;
-    }
-
 }
+interface FetchedPostData {
+    userId: number,
+    id: number,
+    title: string,
+    body: string
+}
+
+
 const initialButtonState: InitialButtonStateType = {
     posts: {
         data: [],
@@ -51,54 +65,23 @@ const initialButtonState: InitialButtonStateType = {
         isError: false,
         isSuccess: false,
     },
-    comments: {
+    users: {
         data: [],
         isLoading: false,
         isError: false,
         isSuccess: false,
-    },
-    albums: {
-        data: [],
-        isLoading: false,
-        isError: false,
-        isSuccess: false,
+        chosenId: undefined
     }
-
-
 }
-export const fetchPosts = createAsyncThunk<PostDataType[], void, { state: RootState, rejectValue: string }>(
-    'fetchPosts',
-    async function fetchPlaceHolderPosts(_, { rejectWithValue }) {
+//#endregion
+//#region  async requests
+
+export const fetchPosts = createAsyncThunk<FetchedPostData[], void, { state: RootState, rejectWithValue: string }>(
+    'fetchPlaceholderPosts', async (_, { rejectWithValue }) => {
         try {
             const response = await fetch('https://jsonplaceholder.typicode.com/posts')
-            return await response.json()
-        }
-        catch (err) {
-            return rejectWithValue(err)
-        }
-    }
-)
-
-export const fetchComments = createAsyncThunk<CommentsDataType[], void, { state: RootState, rejectValue: string }>(
-    'fetchComments',
-    async function fetchPlaceHolderComments(_, { rejectWithValue }) {
-        try {
-            const response = await fetch('https://jsonplaceholder.typicode.com/comments')
-            return await response.json()
-        } catch (err) {
-            return rejectWithValue(err)
-        }
-    }
-)
-
-export const fetchAlbums = createAsyncThunk<AlbumDataType[], void, { state: RootState, rejectWithValue: string }>(
-    'fetchAlbums',
-    async function fetchAlbums(_, { rejectWithValue }) {
-        try {
-            const response = await fetch('https://jsonplaceholder.typicode.com/albums')
             return response.json()
-        }
-        catch (err) {
+        } catch (err) {
             rejectWithValue(err)
         }
     }
@@ -107,56 +90,81 @@ export const fetchAlbums = createAsyncThunk<AlbumDataType[], void, { state: Root
 
 
 
+export const fetchUsers = createAsyncThunk<FetchUserData[], void, { state: RootState, rejectWithValue: string }>(
+    'fetchUsers',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await fetch('https://jsonplaceholder.typicode.com/users')
+            return response.json()
+        }
+        catch (err) {
+            rejectWithValue(err)
+        }
+    }
+)
 
-
+export const fetchUser = createAsyncThunk<FetchUserData, string, { state: RootState, rejectWithValue: string }>(
+    'fetchUser',
+    async (id, { rejectWithValue }) => {
+        try {
+            const response = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`)
+            return response.json()
+        }
+        catch (err) {
+            rejectWithValue(err)
+        }
+    }
+)
+//#endregion
 
 
 const buttonSlice = createSlice({
-    name: 'buttonFetchedData',
+    name: 'fetchButtonData',
     initialState: initialButtonState,
     reducers: {},
     extraReducers: builder => {
-        builder.addCase(fetchPosts.pending, state => {
-            state.posts.isLoading = true;
+        builder.addCase(fetchPosts.pending, (state) => {
+            state.posts.isLoading = true
         })
             .addCase(fetchPosts.fulfilled, (state, action) => {
                 state.posts.isLoading = false;
                 state.posts.isSuccess = true;
-                state.posts.data = action.payload;
+                state.posts.data = action.payload
             })
             .addCase(fetchPosts.rejected, state => {
                 state.posts.isLoading = false;
-                state.posts.isError = true;
+                state.posts.isError = true
             })
-            .addCase(fetchComments.pending, state => {
-                state.comments.isLoading = true;
+            .addCase(fetchUsers.pending, state => {
+                state.users.isLoading = true;
             })
-            .addCase(fetchComments.fulfilled, (state, action) => {
-                state.comments.isLoading = false;
-                state.comments.isSuccess = true;
-                state.comments.data = action.payload;
-            }).addCase(
-                fetchComments.rejected, state => {
-                    state.comments.isLoading = false;
-                    state.comments.isError = true;
+            .addCase(
+                fetchUsers.fulfilled, (state, action) => {
+                    state.users.isLoading = false;
+                    state.users.isSuccess = true;
+                    state.users.data = action.payload
                 })
-
-            .addCase(fetchAlbums.pending, state => {
-                state.albums.isLoading = true;
+            .addCase(fetchUsers.rejected, state => {
+                state.users.isLoading = false;
+                state.users.isError = true
             })
-            .addCase(fetchAlbums.fulfilled, (state, action) => {
-                state.albums.isLoading = false;
-                state.albums.isSuccess = true;
-                state.albums.data = action.payload;
-            }).addCase(
-                fetchAlbums.rejected, state => {
-                    state.albums.isLoading = false;
-                    state.albums.isError = true;
-                })
+            .addCase(fetchUser.pending, state => {
+                state.users.isLoading = true;
+            })
+            .addCase(
+                fetchUser.fulfilled, (state, action) => {
+                    state.users.isLoading = false;
+                    state.users.isSuccess = true;
+                    state.users.chosenId = action.payload
 
+                })
+            .addCase(fetchUser.rejected, state => {
+                state.users.isLoading = false;
+                state.users.isError = true
+            })
     }
-})
 
+})
 
 
 export default buttonSlice.reducer

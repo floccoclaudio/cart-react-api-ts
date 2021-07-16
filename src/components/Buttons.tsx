@@ -1,7 +1,9 @@
 import React from 'react'
-import { useAppDispatch } from '../app/hooks'
+import { useAppDispatch, useAppSelector } from '../app/hooks'
 import styled from 'styled-components'
-import { fetchPosts, fetchComments, fetchAlbums } from '../features/buttonSlice'
+import { fetchPosts, fetchUsers } from '../features/buttonSlice'
+import UserCard from './UserCard'
+
 const StyledButtonWrapper = styled('div')`
   display: grid;
   margin: 10px;
@@ -14,8 +16,10 @@ const StyledButton = styled('button')`
   cursor: pointer;
   border: 5px inset blueviolet;
 `
-
 const Buttons = () => {
+  // const {posts:{data}}=useAppSelector(state => state.buttons)
+  const { data: postData } = useAppSelector(state => state.buttons.posts)
+  const { data: userData } = useAppSelector(state => state.buttons.users)
   const dispatch = useAppDispatch()
   return (
     <StyledButtonWrapper>
@@ -24,9 +28,27 @@ const Buttons = () => {
           dispatch(fetchPosts())
         }}
       >
-        fetch posts
+        Fetch Posts
       </StyledButton>
-      <StyledButton onClick={() => dispatch(fetchPosts())}>
+      {postData.length > 0 && (
+        <>
+          {postData.map(({ body, id }) => {
+            return <p key={id}>{body}</p>
+          })}
+        </>
+      )}
+      <StyledButton
+        onClick={() => {
+          dispatch(fetchUsers())
+        }}
+      >
+        Fetch Users
+      </StyledButton>
+      {userData.map(user => {
+        return <UserCard user={user} key={user.id} />
+      })}
+
+      {/* <StyledButton onClick={() => dispatch(fetchPosts())}>
         fetch comments
       </StyledButton>
       <StyledButton
@@ -36,10 +58,10 @@ const Buttons = () => {
       >
         fetch albums{' '}
       </StyledButton>
-      <StyledButton>fetch photos</StyledButton>
+      <StyledButton>fetch photos</StyledButton> */}
       {/* <StyledButton>fetch</StyledButton> */}
     </StyledButtonWrapper>
   )
 }
 
-export default buttons
+export default Buttons
