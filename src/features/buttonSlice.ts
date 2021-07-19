@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "../app/rootreducer";
-// import { RootState } from "../app/rootreducer";
 
 //#region  Slice type declarations
 
@@ -15,7 +14,7 @@ export interface FetchUserData {
     company: Company;
 }
 
-export interface Address {
+interface Address {
     street: string;
     suite: string;
     city: string;
@@ -23,18 +22,31 @@ export interface Address {
     geo: Geo;
 }
 
-export interface Geo {
+interface Geo {
     lat: string;
     lng: string;
 }
 
-export interface Company {
+interface Company {
     name: string;
     catchPhrase: string;
     bs: string;
 }
 
+interface FetchedPhotos {
+    albumId: number;
+    id: number;
+    title: string;
+    url: string;
+    thumbnailUrl: string;
+}
 
+interface FetchedPostData {
+    id: number,
+    title: string,
+    userId: number,
+    body: string
+}
 interface InitialButtonStateType {
     posts: {
         data: FetchedPostData[],
@@ -49,15 +61,15 @@ interface InitialButtonStateType {
         isSuccess: boolean,
         chosenId?: FetchUserData
     }
-}
-interface FetchedPostData {
-    userId: number,
-    id: number,
-    title: string,
-    body: string
+    photos: {
+        data: FetchedPhotos[],
+        isLoading: boolean,
+        isError: boolean,
+        isSuccess: boolean,
+    }
 }
 
-
+//state values declaration
 const initialButtonState: InitialButtonStateType = {
     posts: {
         data: [],
@@ -71,6 +83,12 @@ const initialButtonState: InitialButtonStateType = {
         isError: false,
         isSuccess: false,
         chosenId: undefined
+    },
+    photos: {
+        data: [],
+        isLoading: false,
+        isError: false,
+        isSuccess: false,
     }
 }
 //#endregion
@@ -113,6 +131,20 @@ export const fetchUser = createAsyncThunk<FetchUserData, string, { state: RootSt
         catch (err) {
             rejectWithValue(err)
         }
+    }
+)
+
+
+
+
+export const fetchImages = createAsyncThunk<FetchedPhotos[], void, { state: RootState, rejectWithValue: string }>(
+    'fetchPics', async (_, { rejectWithValue }) => {
+        try {
+            const response = await fetch('https://jsonplaceholder.typicode.com/photos/?_limit=50')
+
+            return response.json()
+        }
+        catch (err) { rejectWithValue(err) }
     }
 )
 //#endregion
@@ -161,6 +193,18 @@ const buttonSlice = createSlice({
             .addCase(fetchUser.rejected, state => {
                 state.users.isLoading = false;
                 state.users.isError = true
+            })
+            .addCase(fetchImages.pending, state => {
+                state.photos.isLoading = true
+            })
+            .addCase(fetchImages.fulfilled, (state, action) => {
+                state.photos.isLoading = false;
+                state.photos.isSuccess = true;
+                state.photos.data = action.payload;
+            })
+            .addCase(fetchImages.rejected, state => {
+                state.photos.isLoading = false;
+                state.photos.isError = true
             })
     }
 

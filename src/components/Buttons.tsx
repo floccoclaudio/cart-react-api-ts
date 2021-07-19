@@ -1,7 +1,7 @@
 import React from 'react'
 import { useAppDispatch, useAppSelector } from '../app/hooks'
 import styled from 'styled-components'
-import { fetchPosts, fetchUsers } from '../features/buttonSlice'
+import { fetchImages, fetchPosts, fetchUsers } from '../features/buttonSlice'
 import UserCard from './UserCard'
 
 const StyledButtonWrapper = styled('div')`
@@ -48,20 +48,28 @@ const Buttons = () => {
         return <UserCard user={user} key={user.id} />
       })}
 
-      {/* <StyledButton onClick={() => dispatch(fetchPosts())}>
-        fetch comments
-      </StyledButton>
       <StyledButton
         onClick={() => {
-          fetchAlbums()
+          dispatch(fetchImages())
         }}
       >
-        fetch albums{' '}
+        fetch photos
       </StyledButton>
-      <StyledButton>fetch photos</StyledButton> */}
-      {/* <StyledButton>fetch</StyledButton> */}
+
+      <StyledButton>fetch photos</StyledButton>
     </StyledButtonWrapper>
   )
 }
 
 export default Buttons
+
+//  <StyledButton onClick={() => dispatch(fetchPosts())}>
+//   fetch comments
+// </StyledButton>
+// <StyledButton
+//   onClick={() => {
+//     fetchAlbums()
+//   }}
+// >
+//   fetch albums{' '}
+// </StyledButton>
