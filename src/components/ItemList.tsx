@@ -4,8 +4,10 @@ import { useAppDispatch, useAppSelector } from '../app/hooks'
 import ItemCard from './ItemCard'
 import styled from 'styled-components'
 //#region components
-const StyledHeader = styled('header')`
+const StyledHeader = styled('div')`
   border: 2px solid black;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
 `
 //#endregion
 

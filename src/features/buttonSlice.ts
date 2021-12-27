@@ -33,7 +33,7 @@ interface Company {
     bs: string;
 }
 
-interface FetchedPhotos {
+export interface FetchedPhotos {
     albumId: number;
     id: number;
     title: string;
@@ -105,9 +105,6 @@ export const fetchPosts = createAsyncThunk<FetchedPostData[], void, { state: Roo
     }
 )
 
-
-
-
 export const fetchUsers = createAsyncThunk<FetchUserData[], void, { state: RootState, rejectWithValue: string }>(
     'fetchUsers',
     async (_, { rejectWithValue }) => {
@@ -134,21 +131,19 @@ export const fetchUser = createAsyncThunk<FetchUserData, string, { state: RootSt
     }
 )
 
-
-
-
 export const fetchImages = createAsyncThunk<FetchedPhotos[], void, { state: RootState, rejectWithValue: string }>(
-    'fetchPics', async (_, { rejectWithValue }) => {
+    'fetchImages',
+    async (_, { rejectWithValue }) => {
         try {
-            const response = await fetch('https://jsonplaceholder.typicode.com/photos/?_limit=50')
-
+            const response = await fetch('https://jsonplaceholder.typicode.com/photos/?_limit=30')
             return response.json()
         }
-        catch (err) { rejectWithValue(err) }
+        catch (err) {
+            rejectWithValue(err)
+        }
     }
 )
 //#endregion
-
 
 const buttonSlice = createSlice({
     name: 'fetchButtonData',
@@ -194,21 +189,17 @@ const buttonSlice = createSlice({
                 state.users.isLoading = false;
                 state.users.isError = true
             })
-            .addCase(fetchImages.pending, state => {
-                state.photos.isLoading = true
-            })
+            .addCase(fetchImages.pending, state => { state.photos.isLoading = true })
             .addCase(fetchImages.fulfilled, (state, action) => {
                 state.photos.isLoading = false;
                 state.photos.isSuccess = true;
-                state.photos.data = action.payload;
+                state.photos.data = action.payload
             })
             .addCase(fetchImages.rejected, state => {
                 state.photos.isLoading = false;
                 state.photos.isError = true
             })
     }
-
 })
-
 
 export default buttonSlice.reducer
