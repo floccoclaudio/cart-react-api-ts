@@ -1,6 +1,5 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-
 import { FetchUserData } from '../features/buttonSlice'
 interface UserProps {
   user: FetchUserData

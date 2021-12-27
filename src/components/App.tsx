@@ -1,5 +1,5 @@
 import React from 'react'
-import ItemList from './ItemList'
+// import ItemList from './ItemList'
 import styled from 'styled-components'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 // import Navbar from './Navbar'
